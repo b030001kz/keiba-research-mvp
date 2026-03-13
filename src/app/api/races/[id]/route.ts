@@ -1,17 +1,21 @@
-import { db } from '@/lib/db';
+import { supabase } from '@/lib/db/supabase';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const race = db.prepare('SELECT * FROM race WHERE race_id = ?').get(params.id);
-  const runners = db.prepare(`
-    SELECT r.*, o.win_odds, o.popularity
-    FROM runner r
-    LEFT JOIN odds_snapshot o ON r.race_id = o.race_id AND r.horse_number = o.horse_number
-    WHERE r.race_id = ?
-    ORDER BY r.horse_number
-  `).all(params.id);
+  const { id } = await params;
+  const { data: race } = await supabase
+    .from('race')
+    .select('*')
+    .eq('race_id', id)
+    .single();
+
+  const { data: runners } = await supabase
+    .from('runner')
+    .select('*, odds_snapshot(*)')
+    .eq('race_id', id)
+    .order('horse_number', { ascending: true });
 
   return Response.json({ race, runners });
 }

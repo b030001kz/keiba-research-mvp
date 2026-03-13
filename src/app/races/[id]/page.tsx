@@ -7,18 +7,19 @@ import Link from 'next/link';
 export default async function RaceDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const { data: race } = await supabase
     .from('race')
     .select('*')
-    .eq('race_id', params.id)
+    .eq('race_id', id)
     .single();
 
   const { data: runners } = await supabase
     .from('runner')
     .select('*, odds_snapshot(*)')
-    .eq('race_id', params.id)
+    .eq('race_id', id)
     .order('horse_number', { ascending: true });
 
   if (!race) return <div>Race not found</div>;

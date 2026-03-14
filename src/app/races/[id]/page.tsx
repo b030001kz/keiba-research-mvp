@@ -48,6 +48,7 @@ export default async function RaceDetailPage({
     return { ...runner, win_odds: latestOdds?.win_odds, popularity: latestOdds?.popularity, score, decision, reason };
   });
 
+  return (
     <div className="space-y-8 relative">
       {/* Background glow for the header */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-blue-500/10 rounded-full blur-[100px] pointer-events-none -z-10"></div>

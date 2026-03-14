@@ -48,85 +48,111 @@ export default async function RaceDetailPage({
     return { ...runner, win_odds: latestOdds?.win_odds, popularity: latestOdds?.popularity, score, decision, reason };
   });
 
-  return (
-    <div className="space-y-8">
-      <header>
-        <Link href="/races" className="text-blue-400 hover:text-blue-300 flex items-center gap-1 mb-4 text-sm">
+    <div className="space-y-8 relative">
+      {/* Background glow for the header */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-blue-500/10 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+
+      <header className="relative z-10">
+        <Link href="/races" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6 text-sm font-medium bg-white/5 px-4 py-2 rounded-full border border-white/10 hover:bg-white/10">
           <ChevronLeft size={16} /> レース一覧に戻る
         </Link>
-        <div className="flex justify-between items-end">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <div className="text-slate-400 text-sm mb-1">{race.date} {race.venue} {race.race_number}R</div>
-            <h2 className="text-4xl font-black uppercase italic">{race.race_name}</h2>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-lg text-sm font-bold tracking-widest border border-blue-500/20">{race.date}</span>
+              <span className="text-slate-300 font-medium tracking-wide">{race.venue} {race.race_number}R</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black uppercase text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 tracking-tight leading-tight">
+              {race.race_name}
+            </h2>
           </div>
-          <div className="bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
-            <span className="text-slate-400 text-sm">{race.distance}m / {race.track_type} / {race.track_condition}</span>
+          <div className="bg-[#0F172A]/80 backdrop-blur-md px-5 py-3 rounded-2xl border border-white/10 flex items-center gap-4 shrink-0 shadow-xl">
+            <div className="flex flex-col">
+              <span className="text-[10px] text-slate-500 font-bold tracking-widest uppercase mb-1">条件</span>
+              <span className="text-slate-200 font-semibold">{race.distance}m / {race.track_type}</span>
+            </div>
+            <div className="w-px h-8 bg-white/10"></div>
+            <div className="flex flex-col">
+              <span className="text-[10px] text-slate-500 font-bold tracking-widest uppercase mb-1">馬場</span>
+              <span className="text-emerald-400 font-semibold">{race.track_condition}</span>
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-2xl">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-slate-700/50 text-slate-400 text-xs uppercase tracking-wider">
-              <th className="px-6 py-4 font-semibold">馬番</th>
-              <th className="px-6 py-4 font-semibold">馬名 / 騎手 / 厩舎</th>
-              <th className="px-6 py-4 font-semibold">オッズ / 人気</th>
-              <th className="px-6 py-4 font-semibold text-center">スコア</th>
-              <th className="px-6 py-4 font-semibold">判定</th>
-              <th className="px-6 py-4 font-semibold">判断理由</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-700">
-            {runnerResults.map((r) => (
-              <tr key={r.horse_number} className={`hover:bg-slate-700/30 transition-colors ${r.decision === '買い' ? 'bg-blue-500/5' : ''}`}>
-                <td className="px-6 py-4">
-                  <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                    r.bracket_number === 1 ? 'bg-white text-black' : 
-                    r.bracket_number === 2 ? 'bg-black text-white border border-slate-600' :
-                    r.bracket_number === 3 ? 'bg-red-600 text-white' :
-                    r.bracket_number === 4 ? 'bg-blue-600 text-white' :
-                    r.bracket_number === 5 ? 'bg-yellow-500 text-black' :
-                    r.bracket_number === 6 ? 'bg-green-600 text-white' :
-                    r.bracket_number === 7 ? 'bg-orange-500 text-white' : 'bg-pink-500 text-black'
-                  }`}>
-                    {r.horse_number}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="font-bold text-slate-100 italic">DummyHorse_{r.horse_id}</div>
-                  <div className="text-xs text-slate-500 mt-1">{r.jockey_name} / {r.trainer_name}</div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="text-lg font-bold text-blue-400">{r.win_odds?.toFixed(1) || '-'}</div>
-                  <div className="text-xs text-slate-500">{r.popularity}人気</div>
-                </td>
-                <td className="px-6 py-4 text-center">
-                  <div className={`text-xl font-black ${r.score >= 70 ? 'text-blue-400' : r.score >= 50 ? 'text-amber-400' : 'text-slate-500'}`}>
-                    {r.score.toFixed(1)}
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  {r.decision === '買い' ? (
-                    <span className="flex items-center gap-1 text-blue-400 font-bold bg-blue-500/10 px-2 py-1 rounded">
-                      <ShoppingCart size={14} /> 買い
-                    </span>
-                  ) : r.decision === '保留' ? (
-                    <span className="flex items-center gap-1 text-amber-400 font-bold bg-amber-500/10 px-2 py-1 rounded">
-                      <Clock size={14} /> 保留
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1 text-slate-500 font-bold bg-slate-500/10 px-2 py-1 rounded">
-                      <Ban size={14} /> 見送り
-                    </span>
-                  )}
-                </td>
-                <td className="px-6 py-4 text-sm text-slate-400 max-w-xs">{r.reason}</td>
+      <div className="bg-[#0F172A]/70 backdrop-blur-2xl rounded-3xl border border-white/10 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[800px]">
+            <thead>
+              <tr className="bg-black/40 text-slate-400 text-xs font-bold uppercase tracking-widest border-b border-white/10">
+                <th className="px-6 py-5 pl-8 w-24">馬番</th>
+                <th className="px-6 py-5">馬名 / 騎手 / 厩舎</th>
+                <th className="px-6 py-5">オッズ / 人気</th>
+                <th className="px-6 py-5 text-center">期待値スコア</th>
+                <th className="px-6 py-5">システム判定</th>
+                <th className="px-6 py-5 w-64 text-right pr-8">判定理由</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {runnerResults.map((r) => {
+                const isBuy = r.decision === '買い';
+                const isHold = r.decision === '保留';
+                return (
+                  <tr key={r.horse_number} className={`hover:bg-white/[0.02] transition-colors ${
+                    isBuy ? 'bg-blue-500/[0.03] hover:bg-blue-500/[0.05]' : ''
+                  }`}>
+                    <td className="px-6 py-5 pl-8">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg shadow-inner border ${
+                        r.bracket_number === 1 ? 'bg-white text-slate-900 border-slate-300' : 
+                        r.bracket_number === 2 ? 'bg-slate-900 text-white border-slate-700' :
+                        r.bracket_number === 3 ? 'bg-red-500 text-white border-red-600' :
+                        r.bracket_number === 4 ? 'bg-blue-500 text-white border-blue-600' :
+                        r.bracket_number === 5 ? 'bg-yellow-400 text-slate-900 border-yellow-500' :
+                        r.bracket_number === 6 ? 'bg-green-500 text-white border-green-600' :
+                        r.bracket_number === 7 ? 'bg-orange-500 text-white border-orange-600' : 'bg-pink-500 text-white border-pink-600'
+                      }`}>
+                        {r.horse_number}
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="font-bold text-slate-200 text-lg tracking-tight">DummyHorse_{r.horse_id}</div>
+                      <div className="text-sm text-slate-500 mt-1 font-medium">{r.jockey_name} / {r.trainer_name}</div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="text-xl font-black text-white">{r.win_odds?.toFixed(1) || '-'}</div>
+                      <div className="text-xs text-slate-500 font-bold tracking-wider mt-1">{r.popularity}人気</div>
+                    </td>
+                    <td className="px-6 py-5 text-center">
+                      <div className={`text-2xl font-black ${
+                        r.score >= 70 ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]' : 
+                        r.score >= 50 ? 'text-amber-400' : 'text-slate-600'
+                      }`}>
+                        {r.score.toFixed(1)}
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      {isBuy ? (
+                        <span className="inline-flex items-center gap-2 text-blue-400 font-bold bg-blue-500/10 px-3 py-1.5 rounded-lg border border-blue-500/20 shadow-inner">
+                          <ShoppingCart size={16} strokeWidth={2.5} /> 買い
+                        </span>
+                      ) : isHold ? (
+                        <span className="inline-flex items-center gap-2 text-amber-400 font-bold bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20 shadow-inner">
+                          <Clock size={16} strokeWidth={2.5} /> 保留
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-2 text-slate-500 font-bold bg-slate-800/50 px-3 py-1.5 rounded-lg border border-white/5">
+                          <Ban size={16} strokeWidth={2.5} /> 見送り
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-5 pr-8 text-sm text-slate-400 leading-relaxed text-right font-medium">
+                      {r.reason}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-  );
-}

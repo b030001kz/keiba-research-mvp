@@ -156,3 +156,5 @@ export default async function RaceDetailPage({
         </div>
       </div>
     </div>
+  );
+}
